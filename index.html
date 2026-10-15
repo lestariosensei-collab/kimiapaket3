@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TRY OUT TKA 3 KIMIA - SMAN 2 LUWU UTARA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --biru-tua:#1e5a8e;
+  --biru:#2f80c7;
+  --biru-muda:#eaf4fd;
+  --biru-muda2:#d3e9fb;
+  --biru-accent:#4aa3e0;
+  --putih:#ffffff;
+  --merah:#e05252;
+  --hijau:#3fb47a;
+  --kuning:#f0b429;
+  --abu:#7a8ba0;
+  --shadow:0 4px 16px rgba(30,90,142,0.15);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  font-family:'Segoe UI', Tahoma, sans-serif;
+  background:linear-gradient(160deg, var(--biru-muda) 0%, var(--putih) 55%, var(--biru-muda2) 100%);
+  min-height:100vh;
+  color:#1c3550;
+}
+.screen{ display:none; min-height:100vh; }
+.screen.active{ display:flex; flex-direction:column; }
+
+.app-header{
+  background:linear-gradient(90deg, var(--biru-tua), var(--biru));
+  color:#fff;
+  padding:18px 20px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.app-header h1{ font-size:20px; letter-spacing:1px; }
+.app-header p{ font-size:12px; opacity:0.9; margin-top:4px; }
+
+#screen-start{ align-items:center; justify-content:center; padding:20px; }
+.start-card{
+  background:var(--putih);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  max-width:480px;
+  width:100%;
+  padding:30px 26px;
+  border:1px solid var(--biru-muda2);
+  animation:fadeUp .5s ease;
+}
+@keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+.start-card .badge{
+  background:var(--biru-muda);
+  color:var(--biru-tua);
+  display:inline-block;
+  padding:5px 14px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:14px;
+}
+.start-card h2{ color:var(--biru-tua); font-size:22px; margin-bottom:6px; }
+.start-card .desc{ color:var(--abu); font-size:13px; margin-bottom:22px; line-height:1.5; }
+.form-group{ margin-bottom:16px; }
+.form-group label{ display:block; font-size:13px; font-weight:600; color:var(--biru-tua); margin-bottom:6px; }
+.form-group input{
+  width:100%;
+  padding:12px 14px;
+  border:2px solid var(--biru-muda2);
+  border-radius:10px;
+  font-size:14px;
+  background:var(--biru-muda);
+  transition:.2s;
+  color:#1c3550;
+}
+.form-group input:focus{ outline:none; border-color:var(--biru-accent); background:#fff; }
+.info-box{
+  background:var(--biru-muda);
+  border-left:4px solid var(--biru-accent);
+  border-radius:8px;
+  padding:12px 14px;
+  font-size:12px;
+  color:var(--biru-tua);
+  margin-bottom:20px;
+  line-height:1.6;
+}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  border:none; border-radius:12px; cursor:pointer;
+  font-weight:700; font-size:14px; padding:13px 22px;
+  transition:.2s; width:100%;
+}
+.btn-primary{ background:linear-gradient(90deg, var(--biru), var(--biru-accent)); color:#fff; box-shadow:0 4px 12px rgba(47,128,199,0.35);}
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(47,128,199,0.45); }
+.btn-primary:disabled{ background:#c3cfdb; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-secondary{ background:var(--biru-muda); color:var(--biru-tua); border:2px solid var(--biru-muda2); }
+.btn-secondary:hover{ background:var(--biru-muda2); }
+.btn-outline{ background:transparent; color:var(--biru); border:2px solid var(--biru); }
+.btn-danger{ background:linear-gradient(90deg,#e05252,#f07070); color:#fff; }
+
+#screen-quiz{ padding-bottom:20px; }
+.quiz-topbar{
+  position:sticky; top:0; z-index:50;
+  background:linear-gradient(90deg, var(--biru-tua), var(--biru));
+  color:#fff;
+  padding:12px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:var(--shadow);
+  flex-wrap:wrap; gap:10px;
+}
+.quiz-topbar .peserta-info{ font-size:12px; line-height:1.4; }
+.quiz-topbar .peserta-info b{ font-size:14px; }
+.timer-box{
+  background:rgba(255,255,255,0.15);
+  border-radius:10px;
+  padding:8px 16px;
+  text-align:center;
+  min-width:110px;
+}
+.timer-box .label{ font-size:10px; opacity:.85; letter-spacing:1px;}
+.timer-box .time{ font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+.timer-box.warning{ background:rgba(224,82,82,0.35); animation:pulse 1s infinite; }
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.6;} }
+
+.quiz-body{
+  display:flex; gap:18px; padding:18px; max-width:1100px; margin:0 auto; width:100%;
+  align-items:flex-start; flex-wrap:wrap;
+}
+.nav-panel{
+  background:var(--putih);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:16px;
+  width:260px;
+  flex-shrink:0;
+  border:1px solid var(--biru-muda2);
+  transition:width .3s ease, padding .3s ease, opacity .25s ease, margin .3s ease, border .3s ease;
+  overflow:hidden;
+}
+.nav-panel.collapsed{ width:0; padding:0; margin:0; border:none; opacity:0; pointer-events:none; }
+.nav-panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.btn-collapse{
+  background:var(--biru-muda); border:1px solid var(--biru-muda2); color:var(--biru-tua);
+  border-radius:8px; cursor:pointer; font-size:11px; font-weight:700; padding:5px 9px;
+  white-space:nowrap; flex-shrink:0;
+}
+.btn-collapse:hover{ background:var(--biru-muda2); }
+
+.nav-reopen-tab{
+  display:none; position:fixed; left:0; top:50%; transform:translateY(-50%);
+  background:linear-gradient(180deg, var(--biru-tua), var(--biru));
+  color:#fff; border:none; border-radius:0 12px 12px 0;
+  padding:14px 8px; cursor:pointer; z-index:60; box-shadow:var(--shadow);
+  font-size:11px; font-weight:700; writing-mode:vertical-rl; text-orientation:mixed;
+  letter-spacing:1px;
+}
+.nav-reopen-tab.visible{ display:block; }
+.legend{ display:flex; flex-wrap:wrap; gap:8px; font-size:10px; margin-bottom:12px; }
+.legend span{ display:flex; align-items:center; gap:4px; color:var(--abu); }
+.legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+.nav-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.nav-btn{
+  aspect-ratio:1; border-radius:8px; border:none; cursor:pointer;
+  font-size:12px; font-weight:700; color:#fff;
+  background:var(--merah); transition:.15s; position:relative;
+}
+.nav-btn:hover{ transform:scale(1.08); }
+.nav-btn.answered{ background:var(--hijau); }
+.nav-btn.doubt{ background:var(--kuning); color:#5a4400; }
+.nav-btn.current{ box-shadow:0 0 0 3px var(--biru-tua); }
+.nav-summary{ margin-top:14px; font-size:11px; color:var(--abu); line-height:1.8; }
+.nav-summary b{ color:var(--biru-tua); }
+
+.question-panel{
+  background:var(--putih); border-radius:16px; box-shadow:var(--shadow);
+  padding:22px; flex:1; min-width:280px; border:1px solid var(--biru-muda2);
+}
+.q-meta{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;}
+.q-number-badge{ background:var(--biru-tua); color:#fff; font-weight:800; font-size:13px; padding:6px 14px; border-radius:20px; }
+.q-type-badge{ background:var(--biru-muda); color:var(--biru-tua); font-size:11px; font-weight:700; padding:6px 12px; border-radius:20px; border:1px solid var(--biru-muda2); }
+
+.stimulus-box{
+  background:var(--biru-muda); border:1px solid var(--biru-muda2); border-radius:12px;
+  padding:16px; margin-bottom:16px; font-size:17px; line-height:2; color:#1c3550; white-space:pre-line;
+  font-family:'Noto Sans JP', sans-serif;
+}
+.stimulus-box .stim-label{ font-size:11px; font-weight:700; color:var(--biru); margin-bottom:8px; display:block; font-family:'Segoe UI', sans-serif; }
+.q-image-container{ text-align:center; margin-bottom:16px; }
+.instruksi{ font-size:12px; color:var(--abu); font-style:italic; margin-bottom:10px; }
+.q-text{ font-size:18px; line-height:1.8; color:#16314f; margin-bottom:18px; font-weight:600; white-space:pre-line; font-family:'Noto Sans JP', sans-serif; }
+
+.options{ display:flex; flex-direction:column; gap:10px; }
+.option{
+  display:flex; align-items:center; gap:12px; padding:13px 16px;
+  border:2px solid var(--biru-muda2); border-radius:12px; cursor:pointer;
+  transition:.15s; background:#fff;
+}
+.option:hover{ background:var(--biru-muda); border-color:var(--biru-accent); }
+.option.selected{ background:var(--biru-muda2); border-color:var(--biru); }
+.option .opt-mark{
+  width:26px; height:26px; border-radius:50%; border:2px solid var(--biru-accent);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  color:var(--biru-tua); flex-shrink:0; background:#fff;
+}
+.option.selected .opt-mark{ background:var(--biru); color:#fff; }
+.option.checkbox .opt-mark{ border-radius:6px; }
+.option .opt-text{ font-size:17px; color:#1c3550; font-family:'Noto Sans JP', sans-serif; }
+
+.kategori-table{ width:100%; border-collapse:collapse; margin-top:6px; }
+.kategori-table tr{ border-bottom:1px solid var(--biru-muda2); }
+.kategori-table td{ padding:12px 8px; vertical-align:middle; }
+.kategori-table td.stmt{ font-size:16px; color:#1c3550; font-family:'Noto Sans JP', sans-serif; }
+.kategori-choice{ display:flex; gap:8px; justify-content:flex-end; }
+.kc-btn{
+  padding:8px 16px; border-radius:8px; border:2px solid var(--biru-muda2);
+  background:#fff; cursor:pointer; font-size:12px; font-weight:700; color:var(--abu); transition:.15s;
+}
+.kc-btn.benar.active{ background:var(--hijau); color:#fff; border-color:var(--hijau); }
+.kc-btn.salah.active{ background:var(--merah); color:#fff; border-color:var(--merah); }
+
+.q-nav-buttons{ display:flex; justify-content:space-between; margin-top:22px; gap:10px; flex-wrap:wrap; }
+.q-nav-buttons .left-group, .q-nav-buttons .right-group{ display:flex; gap:10px; }
+.q-nav-buttons .btn{ width:auto; padding:11px 18px; }
+
+#screen-result{ align-items:center; justify-content:center; padding:30px 16px; }
+.result-card{
+  background:var(--putih); border-radius:20px; box-shadow:var(--shadow);
+  max-width:520px; width:100%; padding:36px 28px; text-align:center;
+  border:1px solid var(--biru-muda2);
+}
+.result-card .trophy{ font-size:52px; margin-bottom:8px; }
+.result-card h2{ color:var(--biru-tua); font-size:22px; margin-bottom:4px; }
+.result-card .sub{ color:var(--abu); font-size:13px; margin-bottom:24px; }
+.score-circle{
+  width:150px; height:150px; border-radius:50%;
+  background:conic-gradient(var(--biru) calc(var(--pct)*1%), var(--biru-muda2) 0);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 22px auto; position:relative;
+}
+.score-circle::before{ content:''; position:absolute; width:118px; height:118px; background:#fff; border-radius:50%; }
+.score-circle .score-txt{ position:relative; z-index:2; font-size:32px; font-weight:800; color:var(--biru-tua); }
+.result-stats{ display:flex; justify-content:center; gap:22px; margin-bottom:26px; flex-wrap:wrap; }
+.result-stats div{ text-align:center; }
+.result-stats .num{ font-size:20px; font-weight:800; }
+.result-stats .lbl{ font-size:11px; color:var(--abu); }
+.result-stats .benar .num{ color:var(--hijau); }
+.result-stats .salah .num{ color:var(--merah); }
+.result-actions{ display:flex; flex-direction:column; gap:12px; }
+
+footer.foot-note{ text-align:center; font-size:11px; color:var(--abu); padding:16px; }
+
+.pdf-overlay{
+  display:none; position:fixed; inset:0; z-index:999;
+  background:rgba(28,53,80,0.55); align-items:center; justify-content:center;
+}
+.pdf-overlay.active{ display:flex; }
+.pdf-overlay-box{
+  background:#fff; border-radius:16px; padding:28px 36px; text-align:center;
+  box-shadow:var(--shadow); max-width:280px;
+}
+.pdf-spinner{
+  width:42px; height:42px; border:4px solid var(--biru-muda2); border-top-color:var(--biru);
+  border-radius:50%; margin:0 auto 14px auto; animation:spin 0.8s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.pdf-overlay-box p{ font-size:13px; color:var(--biru-tua); font-weight:600; }
+.pdf-overlay-box span{ font-size:11px; color:var(--abu); }
+
+#pdf-render-temp{
+  position:fixed; left:-99999px; top:0; background:#ffffff;
+  font-family:'Noto Sans JP','Segoe UI',sans-serif; color:#1c3550;
+}
+.pdf-cover{ padding:4px; }
+.pdf-cover .pdf-band{ background:#1e5a8e; color:#fff; padding:18px; border-radius:6px; text-align:center; }
+.pdf-cover .pdf-band h1{ font-size:22px; margin-bottom:4px; }
+.pdf-cover .pdf-band h2{ font-size:16px; font-weight:500; margin-bottom:8px; }
+.pdf-cover .pdf-band p{ font-size:12px; opacity:0.9; }
+.pdf-cover .pdf-petunjuk{ font-size:13px; line-height:1.9; padding:16px 4px 4px 4px; }
+.pdf-cover .pdf-petunjuk b{ color:#1e5a8e; }
+.pdf-stimulus-block{ background:#eaf4fd; border:1px solid #d3e9fb; border-radius:8px; padding:14px 16px; }
+.pdf-stimulus-block .pdf-stim-title{ font-size:12px; font-weight:700; color:#2f80c7; margin-bottom:8px; display:block; }
+.pdf-stimulus-block .pdf-stim-text{ font-size:17px; line-height:1.8; white-space:pre-line; }
+.pdf-question-block{ padding:6px 2px; }
+.pdf-question-block .pdf-q-top{ display:flex; gap:10px; align-items:flex-start; margin-bottom:4px; }
+.pdf-question-block .pdf-q-num{ background:#1e5a8e; color:#fff; font-weight:800; font-size:13px; border-radius:14px; padding:3px 12px; flex-shrink:0; }
+.pdf-question-block .pdf-q-instr{ font-size:11px; font-style:italic; color:#7a8ba0; padding-top:4px; }
+.pdf-question-block .pdf-q-text{ font-size:18px; line-height:1.8; font-weight:600; margin:8px 0 12px 0; white-space:pre-line; }
+.pdf-opt{ display:flex; gap:10px; padding:8px 12px; border:1.5px solid #d3e9fb; border-radius:8px; margin-bottom:6px; align-items:center; }
+.pdf-opt .pdf-opt-mark{ width:22px; height:22px; border-radius:50%; border:1.5px solid #4aa3e0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#1e5a8e; flex-shrink:0; }
+.pdf-opt .pdf-opt-text{ font-size:17px; }
+.pdf-kat-row{ display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px solid #d3e9fb; gap:14px; }
+.pdf-kat-row .pdf-kat-text{ font-size:16px; flex:1; }
+.pdf-kat-row .pdf-kat-choice{ font-size:11px; color:#7a8ba0; white-space:nowrap; font-weight:700; }
+.pdf-kunci-title{ font-size:20px; font-weight:800; color:#1e5a8e; text-align:center; padding:10px 0 16px 0; }
+.pdf-kunci-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 24px; font-size:12px; }
+.pdf-kunci-item{ display:flex; justify-content:space-between; padding:5px 4px; border-bottom:1px solid #eaf4fd; }
+.pdf-kunci-item b{ color:#1e5a8e; }
+.pdf-pembahasan-title{ font-size:18px; font-weight:800; color:#1e5a8e; margin:20px 0 10px 0; border-bottom:2px solid #1e5a8e; padding-bottom:4px;}
+.pdf-pembahasan-item{ margin-bottom:12px; font-size:13px; line-height:1.6; background:#f8fafc; padding:10px; border-radius:6px; border-left:3px solid #2f80c7; }
+.pdf-pembahasan-item b{ color:#1e5a8e; }
+
+
+.matrix-table{width:100%;border-collapse:collapse;margin-top:6px;border:1px solid var(--biru-muda2);overflow:hidden;border-radius:10px}
+.matrix-table th{background:var(--biru-tua);color:#fff;padding:10px 8px;font-size:12px;text-align:center}
+.matrix-table td{padding:11px 8px;border-bottom:1px solid var(--biru-muda2);vertical-align:middle}
+.matrix-table td.matrix-stmt{font-size:15px;color:#1c3550;line-height:1.5}
+.matrix-choice{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.matrix-btn{padding:8px 10px;border-radius:8px;border:2px solid var(--biru-muda2);background:#fff;cursor:pointer;font-size:11px;font-weight:800;color:var(--abu);transition:.15s}
+.matrix-btn:hover{border-color:var(--biru-accent);background:var(--biru-muda)}
+.matrix-btn.active{background:var(--biru);color:#fff;border-color:var(--biru)}
+.chem{font-family:'Segoe UI',Arial,sans-serif;letter-spacing:.05px}
+.q-image-container img{max-width:100%;height:auto;border-radius:8px;display:inline-block}
+.stimulus-box{font-family:'Segoe UI',Arial,sans-serif;line-height:1.65}
+.q-text{font-family:'Segoe UI',Arial,sans-serif;line-height:1.65}
+.option .opt-text{font-family:'Segoe UI',Arial,sans-serif}
+.pdf-matrix-row{display:flex;justify-content:space-between;gap:12px;padding:8px 4px;border-bottom:1px solid #d3e9fb}
+.pdf-matrix-row .pdf-matrix-text{font-size:14px;flex:1}
+.pdf-matrix-row .pdf-matrix-choices{font-size:11px;color:#7a8ba0;white-space:nowrap;font-weight:700}
+
+@media(max-width:640px){
+  .quiz-body{ flex-direction:column; }
+  .nav-panel{ width:100%; order:2; }
+  .question-panel{ order:1; }
+  .q-text, .option .opt-text{ font-size:15px; }
+}
+
+/* ===== PROTEKSI SOAL: tidak bisa diblok / disalin / diseret / dicetak ===== */
+#screen-quiz, #screen-quiz *{
+  -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+}
+#screen-quiz *::selection{ background:transparent; color:inherit; }
+#screen-quiz *::-moz-selection{ background:transparent; color:inherit; }
+#screen-quiz .q-image-container img{ pointer-events:none; -webkit-user-drag:none; user-drag:none; }
+@media print{ #screen-quiz{ display:none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ================= SCREEN 1: DATA DIRI ================= -->
+<div class="screen active" id="screen-start">
+  <div class="app-header" style="width:100%;">
+    <h1>🇯🇵 TRY OUT TKA 3 KIMIA</h1>
+    <p>SMAN 2 LUWU UTARA &mdash; Simulasi Ujian Berbasis Web (Paket 3)</p>
+  </div>
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px 16px;">
+    <div class="start-card">
+      <span class="badge">SMAN 2 LUWU UTARA &bull; KIMIA</span>
+      <h2>Formulir Data Peserta</h2>
+      <p class="desc">Isi Nama dan NISN Anda sebelum memulai try out.</p>
+
+      <div class="form-group">
+        <label>NAMA LENGKAP</label>
+        <input type="text" id="input-nama" placeholder="Contoh: Ahmad Fadillah" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>NISN</label>
+        <input type="text" id="input-nisn" placeholder="Contoh: 0051234567" autocomplete="off" inputmode="numeric">
+      </div>
+
+      <div class="info-box">
+        📋 <b>Ketentuan Try Out:</b><br>
+        • Jumlah soal: <b>30 butir</b><br>
+        • Durasi: <b>75 menit</b> (berjalan otomatis)<br>
+        • Tipe Soal: Pilihan Ganda, Benar/Salah, PG Kompleks, &amp; Tabel Pernyataan<br>
+        • Nilai, rincian benar/salah, persentase, serta naskah &amp; pembahasan dapat di-download setelah selesai.
+      </div>
+
+      <button class="btn btn-primary" id="btn-mulai" disabled onclick="mulaiTryOut()">🚀 MULAI TRY OUT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SCREEN 2: QUIZ ================= -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-topbar">
+    <div class="peserta-info">
+      <b id="tb-nama">-</b><br>
+      NISN: <span id="tb-nisn">-</span> &bull; <span>SMAN 2 LUWU UTARA</span>
+    </div>
+    <div class="timer-box" id="timer-box">
+      <div class="label">SISA WAKTU</div>
+      <div class="time" id="timer-display">75:00</div>
+    </div>
+  </div>
+
+  <div class="quiz-body">
+    <div class="nav-panel" id="nav-panel">
+      <div class="nav-panel-head">
+        <h3>NAVIGASI SOAL</h3>
+        <button class="btn-collapse" onclick="toggleNavPanel()">◀ Sembunyikan</button>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--merah)"></i>Belum</span>
+        <span><i style="background:var(--hijau)"></i>Sudah</span>
+        <span><i style="background:var(--kuning)"></i>Ragu</span>
+      </div>
+      <div class="nav-grid" id="nav-grid"></div>
+      <div class="nav-summary">
+        Terjawab: <b id="sum-terjawab">0</b>/30<br>
+        Ragu-ragu: <b id="sum-ragu">0</b><br>
+        Belum dijawab: <b id="sum-belum">30</b>
+      </div>
+      <button class="btn btn-danger" style="margin-top:14px;" onclick="konfirmasiKirim()">📤 KIRIM JAWABAN</button>
+    </div>
+
+    <div class="question-panel">
+      <div class="q-meta">
+        <span class="q-number-badge" id="q-number-badge">SOAL 1/30</span>
+        <button class="btn-collapse" id="btn-show-nav" onclick="toggleNavPanel()" style="display:none;">☰ Tampilkan Navigasi</button>
+        <span class="q-type-badge" id="q-type-badge">PILIHAN GANDA</span>
+      </div>
+      <div id="stimulus-container"></div>
+      <div id="image-container" class="q-image-container"></div>
+      <p class="instruksi" id="q-instruksi">Pilih satu jawaban yang paling tepat!</p>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+
+      <div class="q-nav-buttons">
+        <div class="left-group">
+          <button class="btn btn-secondary" onclick="prevQuestion()">⬅ Sebelumnya</button>
+          <button class="btn btn-outline" id="btn-ragu" onclick="toggleRagu()">🤔 Tandai Ragu-ragu</button>
+        </div>
+        <div class="right-group">
+          <button class="btn btn-primary" onclick="nextQuestion()">Selanjutnya ➡</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-reopen-tab" id="nav-reopen-tab" onclick="toggleNavPanel()">☰ NAVIGASI SOAL</button>
+</div>
+
+<!-- ================= SCREEN 3: RESULT ================= -->
+<div class="screen" id="screen-result">
+  <div class="result-card">
+    <div class="trophy">🏆</div>
+    <h2>Try Out Selesai!</h2>
+    <p class="sub" id="result-nama-sub">Berikut adalah ringkasan hasil ujian Anda.</p>
+
+    <div class="score-circle" id="score-circle" style="--pct:0;">
+      <div class="score-txt" id="score-txt">0%</div>
+    </div>
+
+    <div class="result-stats">
+      <div class="benar"><div class="num" id="stat-benar">0</div><div class="lbl">BENAR</div></div>
+      <div class="salah"><div class="num" id="stat-salah">0</div><div class="lbl">SALAH</div></div>
+      <div><div class="num" id="stat-waktu">0:00</div><div class="lbl">WAKTU DIPAKAI</div></div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-primary" onclick="downloadSertifikat()">📜 DOWNLOAD HASIL SISWA (PDF)</button>
+      <button class="btn btn-outline" onclick="downloadSoalPDF()">📄 DOWNLOAD SOAL &amp; PEMBAHASAN (PDF)</button>
+      <button class="btn btn-secondary" onclick="location.reload()">🔄 Ulangi Try Out</button>
+    </div>
+  </div>
+</div>
+
+<footer class="foot-note">SMAN 2 LUWU UTARA &bull; Try Out TKA 3 Kimia</footer>
+
+<div class="pdf-overlay" id="pdf-overlay">
+  <div class="pdf-overlay-box">
+    <div class="pdf-spinner"></div>
+    <p>Sedang menyusun PDF...</p>
+    <span>Memproses naskah soal dan pembahasan</span>
+  </div>
+</div>
+
+<script>
+/* Soal TRY OUT TKA 3 KIMIA (30 butir) - disusun mengacu kisi-kisi TKA Kimia Kemendikdasmen. */
+const STIM_21_25 = "Etil etanoat (etil asetat) adalah ester yang digunakan sebagai pelarut dan penyedap beraroma buah. Senyawa ini dibuat melalui reaksi esterifikasi dengan katalis H₂SO₄ pekat.\n\nReaksi:  CH₃COOH(l) + C₂H₅OH(l) ⇌ CH₃COOC₂H₅(l) + H₂O(l)\n\nSebanyak 6 gram asam etanoat dicampur dengan 9,2 gram etanol, lalu dipanaskan. Setelah reaksi selesai diperoleh 5,28 gram etil etanoat.\n\n[Ar C=12 H=1 O=16; hasil teoritis dihitung berdasarkan stoikiometri reaksi]";
+const STIM_26_30 = "Industri klor-alkali menghasilkan gas klorin, gas hidrogen, dan NaOH melalui elektrolisis larutan NaCl pekat dengan elektrode inert (grafit).\n\nSeorang teknisi mengelektrolisis 500 mL larutan NaCl pekat menggunakan arus 5 A selama 1930 detik.\n\n[1 F = 96500 C/mol ; volume molar gas (STP) = 22,4 L/mol ; log 2 = 0,30 ; volume larutan dianggap tetap]";
+const QUESTIONS = [
+  {"no": 1, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Nomor atom Fe = 26. Konfigurasi elektron ion Fe³⁺ adalah ….", "options": [{"id": "a", "text": "[Ar] 3d⁵"}, {"id": "b", "text": "[Ar] 4s² 3d⁶"}, {"id": "c", "text": "[Ar] 4s² 3d³"}, {"id": "d", "text": "[Ar] 4s¹ 3d⁴"}, {"id": "e", "text": "[Ar] 3d⁶"}], "correct": "a", "pembahasan": "Konfigurasi Fe: [Ar] 4s² 3d⁶. Pada pembentukan kation, elektron dilepas lebih dahulu dari kulit terluar (4s), yaitu 2 elektron untuk Fe²⁺, kemudian 1 elektron dari 3d untuk Fe³⁺. Jadi Fe³⁺ = [Ar] 3d⁵ (setengah penuh, stabil)."},
+  {"no": 2, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Perhatikan unsur-unsur periode ketiga: Na, Mg, Al, dan Cl. Urutan jari-jari atom dari yang terkecil ke terbesar adalah ….", "options": [{"id": "a", "text": "Na < Mg < Al < Cl"}, {"id": "b", "text": "Al < Cl < Mg < Na"}, {"id": "c", "text": "Cl < Mg < Al < Na"}, {"id": "d", "text": "Cl < Al < Mg < Na"}, {"id": "e", "text": "Mg < Na < Cl < Al"}], "correct": "d", "pembahasan": "Dalam satu periode dari kiri ke kanan jumlah proton bertambah sedangkan jumlah kulit tetap, sehingga tarikan inti terhadap elektron kulit terluar makin kuat dan jari-jari atom mengecil. Urutan: Na > Mg > Al > Cl, sehingga dari terkecil: Cl < Al < Mg < Na."},
+  {"no": 3, "type": "matrix", "instruksi": "Tentukan Benar atau Salah untuk setiap pernyataan!", "text": "Gunakan teori VSEPR untuk menentukan bentuk dan kepolaran molekul berikut.", "columns": ["Benar", "Salah"], "choiceValues": ["benar", "salah"], "statements": [{"text": "SF₆ berbentuk oktahedral dan bersifat nonpolar.", "correct": "benar"}, {"text": "H₂O berbentuk linear karena atom O tidak memiliki pasangan elektron bebas.", "correct": "salah"}, {"text": "PCl₃ berbentuk trigonal piramida dan bersifat polar.", "correct": "benar"}], "pembahasan": "SF₆ memiliki 6 pasangan elektron ikatan tanpa PEB sehingga oktahedral dan simetris (nonpolar). H₂O memiliki 2 PEB dan 2 PEI sehingga berbentuk bengkok (V), bukan linear. PCl₃ memiliki 3 PEI dan 1 PEB sehingga trigonal piramida dan polar."},
+  {"no": 4, "type": "mcma", "instruksi": "Pilih semua jawaban yang benar! Jawaban benar lebih dari satu.", "text": "Perhatikan sifat senyawa ion, senyawa kovalen, dan logam. Pernyataan yang benar adalah ….", "options": [{"id": "a", "text": "HCl berikatan ion karena perbedaan keelektronegatifan H dan Cl sangat besar."}, {"id": "b", "text": "NaCl padat tidak menghantarkan listrik, sedangkan lelehannya dapat menghantarkan listrik."}, {"id": "c", "text": "CCl₄ larut baik dalam air karena bersifat polar."}, {"id": "d", "text": "Senyawa ion umumnya bertitik leleh tinggi karena gaya tarik elektrostatik antarion kuat."}, {"id": "e", "text": "Logam menghantarkan listrik karena elektron valensinya dapat bergerak bebas (terdelokalisasi)."}], "correct": ["b", "d", "e"], "pembahasan": "HCl adalah senyawa kovalen polar, bukan ionik. NaCl padat tidak memiliki ion bebas bergerak, tetapi lelehannya memiliki ion bebas sehingga menghantarkan listrik. CCl₄ nonpolar sehingga tidak larut dalam air. Senyawa ion bertitik leleh tinggi karena gaya elektrostatiknya kuat. Logam menghantarkan listrik karena lautan elektron yang terdelokalisasi."},
+  {"no": 5, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Aluminium terbakar dalam oksigen berlebih menurut reaksi: 4Al(s) + 3O₂(g) → 2Al₂O₃(s). Jika 5,4 gram Al dibakar sempurna, massa Al₂O₃ yang terbentuk adalah …. (Ar Al = 27; O = 16)", "options": [{"id": "a", "text": "10,2 gram"}, {"id": "b", "text": "15,3 gram"}, {"id": "c", "text": "20,4 gram"}, {"id": "d", "text": "30,6 gram"}, {"id": "e", "text": "51,0 gram"}], "correct": "a", "pembahasan": "Mol Al = 5,4/27 = 0,2 mol. Perbandingan koefisien Al : Al₂O₃ = 4 : 2, sehingga mol Al₂O₃ = 0,1 mol. Mr Al₂O₃ = 102, maka massa = 0,1 × 102 = 10,2 gram."},
+  {"no": 6, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Suatu senyawa organik tersusun atas 40% C, 6,7% H, dan 53,3% O (persen massa). Jika massa molekul relatifnya 180, rumus molekul senyawa tersebut adalah …. (Ar C = 12; H = 1; O = 16)", "options": [{"id": "a", "text": "C₂H₄O₂"}, {"id": "b", "text": "C₃H₆O₃"}, {"id": "c", "text": "C₄H₈O₄"}, {"id": "d", "text": "C₅H₁₀O₅"}, {"id": "e", "text": "C₆H₁₂O₆"}], "correct": "e", "pembahasan": "Perbandingan mol C : H : O = 40/12 : 6,7/1 : 53,3/16 = 3,33 : 6,7 : 3,33 = 1 : 2 : 1, sehingga rumus empiris CH₂O (Mr = 30). n = 180/30 = 6, maka rumus molekul = (CH₂O)₆ = C₆H₁₂O₆."},
+  {"no": 7, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Diketahui energi ikatan rata-rata: H–H = 436 kJ/mol; Cl–Cl = 243 kJ/mol; H–Cl = 431 kJ/mol. Perubahan entalpi untuk reaksi H₂(g) + Cl₂(g) → 2HCl(g) adalah ….", "options": [{"id": "a", "text": "+183 kJ"}, {"id": "b", "text": "+92 kJ"}, {"id": "c", "text": "−92 kJ"}, {"id": "d", "text": "−183 kJ"}, {"id": "e", "text": "−366 kJ"}], "correct": "d", "pembahasan": "ΔH = Σ energi ikatan pereaksi − Σ energi ikatan produk = (436 + 243) − (2 × 431) = 679 − 862 = −183 kJ. Reaksi bersifat eksoterm."},
+  {"no": 8, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Sebanyak 50 mL larutan HCl 1 M dicampur dengan 50 mL larutan NaOH 1 M dalam kalorimeter sederhana. Suhu campuran naik dari 27,0 °C menjadi 33,5 °C. Jika massa jenis larutan 1 g/mL dan kalor jenis larutan 4,2 J/g·°C, perubahan entalpi netralisasi adalah ….", "options": [{"id": "a", "text": "−109,2 kJ/mol"}, {"id": "b", "text": "−54,6 kJ/mol"}, {"id": "c", "text": "−27,3 kJ/mol"}, {"id": "d", "text": "−13,65 kJ/mol"}, {"id": "e", "text": "+54,6 kJ/mol"}], "correct": "b", "pembahasan": "Massa larutan = 100 g; ΔT = 6,5 °C. q = m·c·ΔT = 100 × 4,2 × 6,5 = 2730 J = 2,73 kJ. Mol H₂O terbentuk = 0,05 mol. ΔH = −q/mol = −2,73/0,05 = −54,6 kJ/mol (tanda negatif karena suhu naik/eksoterm)."},
+  {"no": 9, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Reaksi A + B → P diselidiki laju reaksinya pada suhu tetap dan diperoleh data pada tabel berikut. Persamaan laju reaksi yang sesuai adalah ….", "options": [{"id": "a", "text": "v = k[A]"}, {"id": "b", "text": "v = k[A][B]"}, {"id": "c", "text": "v = k[A][B]²"}, {"id": "d", "text": "v = k[A]²[B]²"}, {"id": "e", "text": "v = k[A]²[B]"}], "correct": "e", "pembahasan": "Percobaan 1 dan 2: [A] naik 2 kali, laju naik 4 kali, sehingga orde A = 2. Percobaan 1 dan 3: [B] naik 2 kali, laju naik 2 kali, sehingga orde B = 1. Persamaan laju: v = k[A]²[B].", "tableHtml": true, "table": {"headers": ["Percobaan", "[A] (M)", "[B] (M)", "Laju (×10⁻³ M/s)"], "rows": [["1", "0,10", "0,10", "4"], ["2", "0,20", "0,10", "16"], ["3", "0,10", "0,20", "8"]]}},
+  {"no": 10, "type": "mcma", "instruksi": "Pilih semua jawaban yang benar! Jawaban benar lebih dari satu.", "text": "Perhatikan pernyataan tentang faktor-faktor yang memengaruhi laju reaksi. Pernyataan yang benar adalah ….", "options": [{"id": "a", "text": "Menaikkan suhu meningkatkan jumlah partikel yang memiliki energi ≥ energi aktivasi sehingga laju reaksi bertambah."}, {"id": "b", "text": "Katalis mempercepat reaksi dengan menggeser kesetimbangan ke arah produk."}, {"id": "c", "text": "Katalis mempercepat reaksi dengan menurunkan energi aktivasi."}, {"id": "d", "text": "Menaikkan konsentrasi pereaksi memperbesar nilai tetapan laju (k)."}, {"id": "e", "text": "Memperkecil ukuran partikel zat padat memperbesar luas permukaan sehingga reaksi heterogen berlangsung lebih cepat."}], "correct": ["a", "c", "e"], "pembahasan": "Kenaikan suhu menambah fraksi tumbukan efektif. Katalis menyediakan jalur dengan energi aktivasi lebih rendah, tetapi tidak menggeser kesetimbangan. Nilai k hanya bergantung pada suhu (dan katalis), bukan konsentrasi. Luas permukaan yang lebih besar memperbanyak tumbukan pada reaksi heterogen."},
+  {"no": 11, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Sebanyak 2 mol H₂ dan 2 mol I₂ dimasukkan ke dalam wadah 2 L dan terjadi kesetimbangan: H₂(g) + I₂(g) ⇌ 2HI(g). Pada keadaan setimbang terdapat 2 mol HI. Nilai Kc reaksi tersebut adalah ….", "options": [{"id": "a", "text": "0,25"}, {"id": "b", "text": "0,5"}, {"id": "c", "text": "1"}, {"id": "d", "text": "2"}, {"id": "e", "text": "4"}], "correct": "e", "pembahasan": "Terbentuk 2 mol HI berarti H₂ dan I₂ masing-masing bereaksi 1 mol, sehingga sisa 1 mol. Konsentrasi setimbang: [H₂] = [I₂] = 1/2 = 0,5 M; [HI] = 2/2 = 1 M. Kc = [HI]²/([H₂][I₂]) = 1/(0,5 × 0,5) = 4."},
+  {"no": 12, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Sebanyak 100 mL larutan NH₃ 0,2 M dicampur dengan 50 mL larutan HCl 0,2 M. Jika Kb NH₃ = 1 × 10⁻⁵, pH campuran tersebut adalah ….", "options": [{"id": "a", "text": "7"}, {"id": "b", "text": "8"}, {"id": "c", "text": "9"}, {"id": "d", "text": "10"}, {"id": "e", "text": "11"}], "correct": "c", "pembahasan": "Mol NH₃ = 20 mmol; mol HCl = 10 mmol. Setelah reaksi tersisa NH₃ = 10 mmol dan terbentuk NH₄Cl = 10 mmol, sehingga campuran adalah larutan penyangga basa. [OH⁻] = Kb × (basa/asam konjugasi) = 10⁻⁵ × 1 = 10⁻⁵, pOH = 5, pH = 9."},
+  {"no": 13, "type": "matrix", "instruksi": "Tentukan Benar atau Salah untuk setiap pernyataan!", "text": "Perhatikan kesetimbangan: CaCO₃(s) ⇌ CaO(s) + CO₂(g)  ΔH = +178 kJ. Tentukan kebenaran pernyataan berikut.", "columns": ["Benar", "Salah"], "choiceValues": ["benar", "salah"], "statements": [{"text": "Penambahan CaCO₃ padat menggeser kesetimbangan ke kanan.", "correct": "salah"}, {"text": "Tetapan kesetimbangan reaksi dinyatakan sebagai Kc = [CO₂].", "correct": "benar"}, {"text": "Memperbesar volume wadah menggeser kesetimbangan ke kanan.", "correct": "benar"}], "pembahasan": "Zat padat tidak mengubah kesetimbangan dan tidak masuk ke dalam rumus Kc, sehingga Kc = [CO₂]. Memperbesar volume menurunkan tekanan, sehingga kesetimbangan bergeser ke sisi dengan mol gas lebih banyak, yaitu ke kanan (CO₂)."},
+  {"no": 14, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Larutan asam asetat (CH₃COOH) 0,1 M memiliki Ka = 1 × 10⁻⁵. pH larutan tersebut adalah ….", "options": [{"id": "a", "text": "1"}, {"id": "b", "text": "2"}, {"id": "c", "text": "3"}, {"id": "d", "text": "4"}, {"id": "e", "text": "5"}], "correct": "c", "pembahasan": "[H⁺] = √(Ka × M) = √(10⁻⁵ × 10⁻¹) = √10⁻⁶ = 10⁻³ M. pH = −log 10⁻³ = 3."},
+  {"no": 15, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Pada pengujian bahan makanan dengan pereaksi Biuret (NaOH dan CuSO₄ encer) diperoleh warna ungu. Hal ini menunjukkan bahwa bahan makanan tersebut mengandung ….", "options": [{"id": "a", "text": "karbohidrat"}, {"id": "b", "text": "protein"}, {"id": "c", "text": "lemak"}, {"id": "d", "text": "amilum"}, {"id": "e", "text": "glukosa"}], "correct": "b", "pembahasan": "Uji Biuret positif (warna ungu atau violet) menandakan adanya ikatan peptida, yaitu ciri protein. Karbohidrat diuji dengan Molisch, Benedict, atau iodin; lemak dengan uji kertas minyak."},
+  {"no": 16, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Garam yang larutannya dalam air bersifat asam adalah ….", "options": [{"id": "a", "text": "NaCl"}, {"id": "b", "text": "CH₃COOK"}, {"id": "c", "text": "NH₄Cl"}, {"id": "d", "text": "KNO₃"}, {"id": "e", "text": "Na₂CO₃"}], "correct": "c", "pembahasan": "NH₄Cl berasal dari basa lemah (NH₃) dan asam kuat (HCl). Ion NH₄⁺ terhidrolisis: NH₄⁺ + H₂O ⇌ NH₃ + H₃O⁺, sehingga larutan bersifat asam. NaCl dan KNO₃ netral, sedangkan CH₃COOK dan Na₂CO₃ bersifat basa."},
+  {"no": 17, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Diketahui Ksp Mg(OH)₂ = 4 × 10⁻¹². Kelarutan Mg(OH)₂ dalam air murni adalah ….", "options": [{"id": "a", "text": "1 × 10⁻⁶ M"}, {"id": "b", "text": "4 × 10⁻⁶ M"}, {"id": "c", "text": "1 × 10⁻⁴ M"}, {"id": "d", "text": "2 × 10⁻⁴ M"}, {"id": "e", "text": "4 × 10⁻⁴ M"}], "correct": "c", "pembahasan": "Mg(OH)₂ ⇌ Mg²⁺ + 2OH⁻. Jika kelarutan = s, maka [Mg²⁺] = s dan [OH⁻] = 2s. Ksp = s × (2s)² = 4s³ = 4 × 10⁻¹², sehingga s³ = 10⁻¹² dan s = 10⁻⁴ M."},
+  {"no": 18, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Sebanyak 11,7 gram NaCl (Mr = 58,5) dilarutkan dalam 500 gram air. Jika Kf air = 1,86 °C/m dan NaCl terionisasi sempurna, titik beku larutan tersebut adalah …. (titik beku air = 0 °C)", "options": [{"id": "a", "text": "−0,744 °C"}, {"id": "b", "text": "−1,488 °C"}, {"id": "c", "text": "−2,232 °C"}, {"id": "d", "text": "−2,976 °C"}, {"id": "e", "text": "−3,720 °C"}], "correct": "b", "pembahasan": "Mol NaCl = 11,7/58,5 = 0,2 mol; molalitas = 0,2/0,5 = 0,4 m. NaCl → Na⁺ + Cl⁻ sehingga i = 2. ΔTf = m × Kf × i = 0,4 × 1,86 × 2 = 1,488 °C. Tf larutan = 0 − 1,488 = −1,488 °C."},
+  {"no": 19, "type": "matrix", "instruksi": "Tentukan Benar atau Salah untuk setiap pernyataan!", "text": "Perhatikan sifat-sifat sistem koloid berikut. Tentukan kebenaran pernyataan yang diberikan.", "columns": ["Benar", "Salah"], "choiceValues": ["benar", "salah"], "statements": [{"text": "Efek Tyndall dapat digunakan untuk membedakan koloid dari larutan sejati.", "correct": "benar"}, {"text": "Gerak Brown pada koloid disebabkan oleh tumbukan partikel koloid dengan molekul medium pendispersi.", "correct": "benar"}, {"text": "Santan termasuk koloid jenis sol.", "correct": "salah"}], "pembahasan": "Koloid menghamburkan cahaya (efek Tyndall), sedangkan larutan sejati tidak. Gerak Brown terjadi karena tumbukan tak seimbang oleh molekul medium. Santan adalah emulsi (cairan terdispersi dalam cairan), bukan sol (padat dalam cair)."},
+  {"no": 20, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Perhatikan sel volta dengan notasi Zn | Zn²⁺ || Ni²⁺ | Ni. Diketahui E° Zn²⁺/Zn = −0,76 V dan E° Ni²⁺/Ni = −0,25 V. Pernyataan yang benar adalah ….", "options": [{"id": "a", "text": "Zn bertindak sebagai katode dan E° sel = +0,51 V"}, {"id": "b", "text": "Ni bertindak sebagai anode dan E° sel = +0,51 V"}, {"id": "c", "text": "Zn bertindak sebagai anode dan E° sel = +1,01 V"}, {"id": "d", "text": "Ni bertindak sebagai katode dan E° sel = −0,51 V"}, {"id": "e", "text": "Zn bertindak sebagai anode dan E° sel = +0,51 V"}], "correct": "e", "pembahasan": "Zn memiliki E° lebih negatif sehingga lebih mudah teroksidasi dan menjadi anode; Ni²⁺ tereduksi di katode. E° sel = E°katode − E°anode = (−0,25) − (−0,76) = +0,51 V."},
+  {"no": 21, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Senyawa hasil reaksi tersebut termasuk golongan … dengan gugus fungsi ….", "options": [{"id": "a", "text": "ester; –COO–"}, {"id": "b", "text": "eter; –O–"}, {"id": "c", "text": "keton; –CO–"}, {"id": "d", "text": "asam karboksilat; –COOH"}, {"id": "e", "text": "aldehid; –CHO"}], "correct": "a", "pembahasan": "Reaksi antara asam karboksilat dan alkohol menghasilkan ester dan air. Etil etanoat (CH₃COOC₂H₅) memiliki gugus fungsi ester, yaitu –COO–.", "stimulus": STIM_21_25},
+  {"no": 22, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Pereaksi pembatas dan massa etil etanoat teoritis yang dapat terbentuk adalah ….", "options": [{"id": "a", "text": "etanol; 8,8 gram"}, {"id": "b", "text": "etanol; 17,6 gram"}, {"id": "c", "text": "asam etanoat; 8,8 gram"}, {"id": "d", "text": "asam etanoat; 17,6 gram"}, {"id": "e", "text": "asam etanoat; 5,28 gram"}], "correct": "c", "pembahasan": "Mol CH₃COOH = 6/60 = 0,1 mol; mol C₂H₅OH = 9,2/46 = 0,2 mol. Perbandingan koefisien 1 : 1, sehingga asam etanoat habis lebih dahulu (pereaksi pembatas). Mol ester teoritis = 0,1 mol; massa = 0,1 × 88 = 8,8 gram.", "stimulus": STIM_21_25},
+  {"no": 23, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Persentase rendemen (hasil) etil etanoat pada percobaan tersebut adalah ….", "options": [{"id": "a", "text": "30%"}, {"id": "b", "text": "45%"}, {"id": "c", "text": "50%"}, {"id": "d", "text": "60%"}, {"id": "e", "text": "75%"}], "correct": "d", "pembahasan": "Rendemen = (massa hasil nyata / massa hasil teoritis) × 100% = (5,28 / 8,8) × 100% = 60%.", "stimulus": STIM_21_25},
+  {"no": 24, "type": "matrix", "instruksi": "Tentukan Benar atau Salah untuk setiap pernyataan!", "text": "Tentukan kebenaran pernyataan berikut mengenai reaksi pembuatan etil etanoat.", "columns": ["Benar", "Salah"], "choiceValues": ["benar", "salah"], "statements": [{"text": "Reaksi antara asam karboksilat dan alkohol membentuk ester disebut esterifikasi.", "correct": "benar"}, {"text": "H₂SO₄ pekat menggeser kesetimbangan ke arah pereaksi karena menyerap air.", "correct": "salah"}, {"text": "Etil etanoat dan asam butanoat merupakan isomer posisi.", "correct": "salah"}], "pembahasan": "Pembentukan ester dari asam karboksilat dan alkohol disebut esterifikasi. H₂SO₄ pekat bersifat katalis dan higroskopis (menyerap air) sehingga kesetimbangan bergeser ke arah produk (ester). Etil etanoat dan asam butanoat sama-sama C₄H₈O₂ tetapi gugus fungsinya berbeda, sehingga merupakan isomer fungsi.", "stimulus": STIM_21_25},
+  {"no": 25, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Jika etil etanoat dipanaskan dengan larutan NaOH (reaksi penyabunan), hasil reaksi yang diperoleh adalah ….", "options": [{"id": "a", "text": "asam etanoat dan etanol"}, {"id": "b", "text": "natrium etanoat dan air"}, {"id": "c", "text": "etanal dan etanol"}, {"id": "d", "text": "asam etanoat dan natrium etoksida"}, {"id": "e", "text": "natrium etanoat dan etanol"}], "correct": "e", "pembahasan": "Hidrolisis ester dalam suasana basa (saponifikasi): CH₃COOC₂H₅ + NaOH → CH₃COONa + C₂H₅OH, menghasilkan garam karboksilat (natrium etanoat) dan alkohol (etanol).", "stimulus": STIM_21_25},
+  {"no": 26, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Reaksi yang terjadi di katode pada elektrolisis tersebut adalah ….", "options": [{"id": "a", "text": "Na⁺(aq) + e⁻ → Na(s)"}, {"id": "b", "text": "2Cl⁻(aq) → Cl₂(g) + 2e⁻"}, {"id": "c", "text": "2H₂O(l) → O₂(g) + 4H⁺(aq) + 4e⁻"}, {"id": "d", "text": "2H₂O(l) + 2e⁻ → H₂(g) + 2OH⁻(aq)"}, {"id": "e", "text": "Cl₂(g) + 2e⁻ → 2Cl⁻(aq)"}], "correct": "d", "pembahasan": "Di katode terjadi reduksi. Kation Na⁺ (golongan IA) tidak direduksi dalam larutan berair, yang direduksi adalah air: 2H₂O + 2e⁻ → H₂ + 2OH⁻.", "stimulus": STIM_26_30},
+  {"no": 27, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Jumlah mol elektron yang mengalir selama elektrolisis adalah ….", "options": [{"id": "a", "text": "0,10 mol"}, {"id": "b", "text": "0,20 mol"}, {"id": "c", "text": "0,50 mol"}, {"id": "d", "text": "1,00 mol"}, {"id": "e", "text": "2,00 mol"}], "correct": "a", "pembahasan": "Q = i × t = 5 × 1930 = 9650 C. Mol elektron = Q/F = 9650/96500 = 0,10 mol.", "stimulus": STIM_26_30},
+  {"no": 28, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Volume gas hidrogen yang terbentuk di katode pada keadaan STP adalah ….", "options": [{"id": "a", "text": "0,56 L"}, {"id": "b", "text": "1,12 L"}, {"id": "c", "text": "2,24 L"}, {"id": "d", "text": "4,48 L"}, {"id": "e", "text": "11,2 L"}], "correct": "b", "pembahasan": "2H₂O + 2e⁻ → H₂ + 2OH⁻, sehingga 2 mol e⁻ menghasilkan 1 mol H₂. Mol H₂ = 0,10/2 = 0,05 mol. Volume = 0,05 × 22,4 = 1,12 L.", "stimulus": STIM_26_30},
+  {"no": 29, "type": "pg", "instruksi": "Pilihlah satu jawaban yang paling tepat!", "text": "Setelah elektrolisis selesai, pH larutan adalah ….", "options": [{"id": "a", "text": "12,3"}, {"id": "b", "text": "12,7"}, {"id": "c", "text": "13,0"}, {"id": "d", "text": "13,3"}, {"id": "e", "text": "13,7"}], "correct": "d", "pembahasan": "Mol OH⁻ yang terbentuk sama dengan mol elektron = 0,10 mol. [OH⁻] = 0,10/0,5 = 0,2 M. pOH = −log (2 × 10⁻¹) = 1 − 0,30 = 0,70. pH = 14 − 0,70 = 13,3.", "stimulus": STIM_26_30},
+  {"no": 30, "type": "mcma", "instruksi": "Pilih semua jawaban yang benar! Jawaban benar lebih dari satu.", "text": "Pernyataan yang benar mengenai elektrolisis larutan NaCl pekat dengan elektrode inert tersebut adalah ….", "options": [{"id": "a", "text": "Ion Na⁺ tereduksi di katode membentuk logam natrium."}, {"id": "b", "text": "Gas Cl₂ terbentuk di anode."}, {"id": "c", "text": "Gas H₂ terbentuk di katode."}, {"id": "d", "text": "Anode merupakan kutub negatif pada sel elektrolisis."}, {"id": "e", "text": "pH larutan di sekitar katode meningkat."}], "correct": ["b", "c", "e"], "pembahasan": "Di anode, ion Cl⁻ teroksidasi menjadi Cl₂ (NaCl pekat). Di katode, air tereduksi menjadi H₂ dan OH⁻ sehingga pH naik. Na⁺ tidak direduksi dalam larutan berair. Pada sel elektrolisis anode adalah kutub positif dan katode kutub negatif.", "stimulus": STIM_26_30},
+];
+const TOTAL_SOAL=QUESTIONS.length;
+const DURASI_DETIK=75*60;
+let peserta={nama:"",nisn:""}, currentIndex=0, answers={}, doubtful={}, timeLeft=DURASI_DETIK, timerInterval=null, submitted=false;
+let hasilAkhir={benar:0,salah:0,skor:0,persentase:0,waktuPakai:0};
+
+document.getElementById("input-nama").addEventListener("input",cekForm);
+document.getElementById("input-nisn").addEventListener("input",cekForm);
+
+function cekForm(){
+  const nama=document.getElementById("input-nama").value.trim();
+  const nisn=document.getElementById("input-nisn").value.trim();
+  document.getElementById("btn-mulai").disabled=!(nama&&nisn);
+}
+function mulaiTryOut(){
+  peserta.nama=document.getElementById("input-nama").value.trim();
+  peserta.nisn=document.getElementById("input-nisn").value.trim();
+  document.getElementById("tb-nama").textContent=peserta.nama;
+  document.getElementById("tb-nisn").textContent=peserta.nisn;
+  switchScreen("screen-quiz"); buildNavGrid(); renderQuestion(0); startTimer();
+}
+function switchScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+function startTimer(){
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{timeLeft--;updateTimerDisplay();if(timeLeft<=0){clearInterval(timerInterval);timeLeft=0;updateTimerDisplay();autoSubmit();}},1000);
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timeLeft/60),s=timeLeft%60;
+  document.getElementById("timer-display").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  document.getElementById("timer-box").classList.toggle("warning",timeLeft<=300);
+}
+function buildNavGrid(){
+  const grid=document.getElementById("nav-grid");grid.innerHTML="";
+  QUESTIONS.forEach((q,idx)=>{const btn=document.createElement("button");btn.className="nav-btn";btn.textContent=q.no;btn.id="navbtn-"+q.no;btn.onclick=()=>renderQuestion(idx);grid.appendChild(btn);});
+  refreshNavColors();
+}
+function isAnswered(q){
+  const a=answers[q.no];
+  if(a===undefined||a===null)return false;
+  if(q.type==="pg")return !!a;
+  if(q.type==="mcma")return Array.isArray(a)&&a.length>0;
+  if(q.type==="matrix")return Array.isArray(a)&&a.length===q.statements.length&&a.every(v=>v!==null&&v!==undefined);
+  return false;
+}
+function refreshNavColors(){
+  let terjawab=0,ragu=0;
+  QUESTIONS.forEach((q,idx)=>{const btn=document.getElementById("navbtn-"+q.no);btn.classList.remove("answered","doubt","current");if(idx===currentIndex)btn.classList.add("current");if(doubtful[q.no]){btn.classList.add("doubt");ragu++;if(isAnswered(q))terjawab++;}else if(isAnswered(q)){btn.classList.add("answered");terjawab++;}});
+  document.getElementById("sum-terjawab").textContent=terjawab;
+  document.getElementById("sum-ragu").textContent=ragu;
+  document.getElementById("sum-belum").textContent=TOTAL_SOAL-terjawab;
+}
+function escapeHtml(str){const div=document.createElement("div");div.textContent=str;return div.innerHTML;}
+function renderSimpleTable(t){
+  let h='<div style="overflow-x:auto;margin:10px 0"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr>'+t.headers.map(x=>'<th style="background:var(--biru-tua);color:#fff;padding:8px;border:1px solid #d3e9fb">'+escapeHtml(x)+'</th>').join('')+'</tr></thead><tbody>';
+  t.rows.forEach(r=>{h+='<tr>'+r.map(x=>'<td style="padding:8px;border:1px solid #d3e9fb;text-align:center">'+escapeHtml(x)+'</td>').join('')+'</tr>';});
+  return h+'</tbody></table></div>';
+}
+function renderQuestion(idx){
+  currentIndex=idx;const q=QUESTIONS[idx];
+  document.getElementById("q-number-badge").textContent="SOAL "+q.no+"/30";
+  document.getElementById("q-type-badge").textContent=q.type==="pg"?"PILIHAN GANDA":q.type==="mcma"?"PG KOMPLEKS (MCMA)":"BENAR / SALAH / TABEL";
+  document.getElementById("q-instruksi").textContent=q.instruksi;
+  document.getElementById("q-text").textContent=q.text;
+  const stim=document.getElementById("stimulus-container");
+  stim.innerHTML=q.stimulus?'<div class="stimulus-box"><span class="stim-label">📖 TEKS / STIMULUS</span>'+escapeHtml(q.stimulus)+'</div>':"";
+  const img=document.getElementById("image-container");img.innerHTML=q.image?'<img src="'+q.image+'" alt="Gambar soal dari PDF sumber">':"";
+  const body=document.getElementById("q-body");body.innerHTML="";
+  if(q.tableHtml) body.innerHTML=renderSimpleTable(q.table);
+  if(q.extraText){const p=document.createElement("div");p.className="q-text";p.style.fontSize="16px";p.style.marginTop="4px";p.textContent=q.extraText;body.appendChild(p);}
+  if(q.type==="pg"||q.type==="mcma"){
+    const wrap=document.createElement("div");wrap.className="options";const selected=answers[q.no]||[];
+    q.options.forEach(opt=>{const div=document.createElement("div");const active=q.type==="pg"?selected===opt.id:selected.includes(opt.id);div.className="option"+(q.type==="mcma"?" checkbox":"")+(active?" selected":"");div.onclick=()=>q.type==="pg"?pilihPG(q.no,opt.id):pilihMCMA(q.no,opt.id);div.innerHTML='<span class="opt-mark">'+(q.type==="mcma"?(active?"✓":""):opt.id.toUpperCase())+'</span><span class="opt-text">'+escapeHtml(opt.text)+'</span>';wrap.appendChild(div);});body.appendChild(wrap);
+  } else if(q.type==="matrix"){
+    const table=document.createElement("table");table.className="matrix-table";
+    const trh=document.createElement("tr");trh.innerHTML='<th>Pernyataan</th>'+q.columns.map(c=>'<th>'+escapeHtml(c)+'</th>').join("");table.appendChild(trh);
+    const current=answers[q.no]||new Array(q.statements.length).fill(null);
+    q.statements.forEach((st,i)=>{const tr=document.createElement("tr");const val=current[i];let cells='<td class="matrix-stmt">'+escapeHtml(st.text)+'</td>';
+      const vals=q.choiceValues||q.columns.map(c=>c.toLowerCase());
+      vals.forEach((v,j)=>{const active=val===v;cells+='<td><div class="matrix-choice"><button class="matrix-btn'+(active?" active":"")+'" onclick="pilihMatrix('+q.no+','+i+',\''+v+'\')">'+escapeHtml(q.columns[j])+'</button></div></td>';});
+      tr.innerHTML=cells;table.appendChild(tr);
+    });body.appendChild(table);
+    if(q.note){const n=document.createElement("div");n.style.cssText="margin-top:10px;font-size:13px;color:var(--abu);line-height:1.6";n.textContent=q.note;body.appendChild(n);}
+  }
+  const ragu=document.getElementById("btn-ragu");ragu.style.background=doubtful[q.no]?"var(--kuning)":"";ragu.style.color=doubtful[q.no]?"#5a4400":"";ragu.style.borderColor=doubtful[q.no]?"var(--kuning)":"";
+  refreshNavColors();
+}
+function pilihPG(no,id){answers[no]=id;renderQuestion(currentIndex);}
+function pilihMCMA(no,id){let arr=answers[no]?answers[no].slice():[];arr.includes(id)?arr=arr.filter(x=>x!==id):arr.push(id);answers[no]=arr;renderQuestion(currentIndex);}
+function pilihMatrix(no,i,val){const q=QUESTIONS.find(x=>x.no===no);let arr=answers[no]?answers[no].slice():new Array(q.statements.length).fill(null);arr[i]=val;answers[no]=arr;renderQuestion(currentIndex);}
+function toggleRagu(){const q=QUESTIONS[currentIndex];doubtful[q.no]=!doubtful[q.no];renderQuestion(currentIndex);}
+function prevQuestion(){if(currentIndex>0)renderQuestion(currentIndex-1);}
+function nextQuestion(){if(currentIndex<TOTAL_SOAL-1)renderQuestion(currentIndex+1);else konfirmasiKirim();}
+let navPanelHidden=false;
+function toggleNavPanel(){navPanelHidden=!navPanelHidden;document.getElementById("nav-panel").classList.toggle("collapsed",navPanelHidden);document.getElementById("nav-reopen-tab").classList.toggle("visible",navPanelHidden);document.getElementById("btn-show-nav").style.display=navPanelHidden?"inline-flex":"none";}
+function konfirmasiKirim(){const belum=TOTAL_SOAL-QUESTIONS.filter(isAnswered).length;const pesan=belum>0?"Masih ada "+belum+" soal yang belum dikerjakan.\n\nYakin ingin mengirim jawaban?":"Semua soal telah dikerjakan.\n\nKirim jawaban sekarang?";if(confirm(pesan))finishTest(false);}
+function autoSubmit(){if(submitted)return;alert("⏰ Waktu habis! Soal dikirim otomatis.");finishTest(true);}
+function cekJawabanBenar(q){
+  const a=answers[q.no];if(a===undefined||a===null)return false;
+  if(q.type==="pg")return a===q.correct;
+  if(q.type==="mcma")return Array.isArray(a)&&[...a].sort().join(",")===[...q.correct].sort().join(",");
+  if(q.type==="matrix")return Array.isArray(a)&&a.length===q.statements.length&&q.statements.every((st,i)=>a[i]===st.correct);
+  return false;
+}
+function finishTest(otomatis){
+  if(submitted)return;submitted=true;clearInterval(timerInterval);
+  let benar=0;QUESTIONS.forEach(q=>{if(cekJawabanBenar(q))benar++;});
+  const salah=TOTAL_SOAL-benar,persentase=Math.round(benar/TOTAL_SOAL*100),waktuPakai=DURASI_DETIK-timeLeft;
+  hasilAkhir={benar,salah,skor:persentase,persentase,waktuPakai};tampilkanHasil();
+}
+function tampilkanHasil(){
+  switchScreen("screen-result");
+  document.getElementById("result-nama-sub").textContent="Selamat "+peserta.nama+"! Berikut rincian hasil Try Out TKA 3 Kimia Anda.";
+  document.getElementById("score-circle").style.setProperty("--pct",hasilAkhir.persentase);
+  document.getElementById("score-txt").textContent=hasilAkhir.persentase+"%";
+  document.getElementById("stat-benar").textContent=hasilAkhir.benar;
+  document.getElementById("stat-salah").textContent=hasilAkhir.salah;
+  const m=Math.floor(hasilAkhir.waktuPakai/60),s=hasilAkhir.waktuPakai%60;
+  document.getElementById("stat-waktu").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+function downloadSertifikat(){
+  const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"}),W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  doc.setDrawColor(30,90,142);doc.setLineWidth(2);doc.rect(8,8,W-16,H-16);doc.setDrawColor(74,163,224);doc.setLineWidth(.6);doc.rect(12,12,W-24,H-24);
+  doc.setTextColor(30,90,142);doc.setFont("helvetica","bold");doc.setFontSize(24);doc.text("HASIL TRY OUT TKA 3 KIMIA",W/2,32,{align:"center"});
+  doc.setFontSize(14);doc.setTextColor(47,128,199);doc.text("SMAN 2 LUWU UTARA",W/2,41,{align:"center"});
+  doc.setDrawColor(211,233,251);doc.setLineWidth(1);doc.line(W/2-60,46,W/2+60,46);
+  doc.setFont("helvetica","normal");doc.setFontSize(11);doc.setTextColor(90,90,90);doc.text("Diberikan kepada:",W/2,58,{align:"center"});
+  doc.setFont("helvetica","bold");doc.setFontSize(22);doc.setTextColor(28,53,80);doc.text(peserta.nama.toUpperCase(),W/2,70,{align:"center"});
+  doc.setFont("helvetica","normal");doc.setFontSize(12);doc.setTextColor(90,90,90);doc.text("NISN: "+peserta.nisn+"   |   Sekolah: SMAN 2 LUWU UTARA",W/2,78,{align:"center"});
+  const boxY=92;doc.setFillColor(234,244,253);doc.roundedRect(W/2-80,boxY,160,45,4,4,"F");doc.setDrawColor(211,233,251);doc.roundedRect(W/2-80,boxY,160,45,4,4,"S");
+  doc.setFont("helvetica","bold");doc.setFontSize(32);doc.setTextColor(30,90,142);doc.text(hasilAkhir.persentase+"%",W/2-48,boxY+24,{align:"center"});doc.setFontSize(9);doc.setFont("helvetica","normal");doc.text("PERSENTASE BENAR",W/2-48,boxY+33,{align:"center"});
+  doc.setFont("helvetica","bold");doc.setFontSize(14);doc.setTextColor(63,180,122);doc.text("JUMLAH BENAR: "+hasilAkhir.benar+" Soal",W/2+10,boxY+18);doc.setTextColor(224,82,82);doc.text("JUMLAH SALAH: "+hasilAkhir.salah+" Soal",W/2+10,boxY+28);
+  const mm=Math.floor(hasilAkhir.waktuPakai/60),ss=hasilAkhir.waktuPakai%60;doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(90,90,90);doc.text("Waktu Pengerjaan: "+String(mm).padStart(2,"0")+" Menit "+String(ss).padStart(2,"0")+" Detik",W/2,boxY+56,{align:"center"});
+  const tanggal=new Date().toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});doc.setFontSize(9);doc.text("Dicetak otomatis oleh Sistem Try Out SMAN 2 Luwu Utara pada "+tanggal,W/2,H-20,{align:"center"});
+  doc.save("Hasil_TryOut_TKA3_Kimia_"+peserta.nama.replace(/\s+/g,"_")+".pdf");
+}
+function escAttr(str){const div=document.createElement("div");div.textContent=str;return div.innerHTML;}
+function buildQuestionBlockHtml(q){
+  let body="";
+  if(q.tableHtml) body+=renderSimpleTablePdf(q.table);
+  if(q.extraText) body+='<div style="font-size:15px;line-height:1.6;margin:5px 0 10px">'+escAttr(q.extraText)+'</div>';
+  if(q.type==="pg"||q.type==="mcma") body+=q.options.map(opt=>'<div class="pdf-opt"><span class="pdf-opt-mark">'+opt.id.toUpperCase()+'</span><span class="pdf-opt-text">'+escAttr(opt.text)+'</span></div>').join("");
+  else if(q.type==="matrix") body+=q.statements.map((st)=>'<div class="pdf-matrix-row"><span class="pdf-matrix-text">'+escAttr(st.text)+'</span><span class="pdf-matrix-choices">['+q.columns.join("]  [")+']</span></div>').join("");
+  const imgHtml=q.image?'<div style="text-align:center;margin:10px 0;"><img src="'+q.image+'" style="max-width:520px;max-height:330px;"></div>':"";
+  const stimHtml=q.stimulus?'<div class="pdf-stimulus-block" style="margin-bottom:8px;"><span class="pdf-stim-title">📖 TEKS SOAL</span><div class="pdf-stim-text">'+escAttr(q.stimulus)+'</div></div>':"";
+  return '<div class="pdf-question-block">'+stimHtml+imgHtml+'<div class="pdf-q-top"><span class="pdf-q-num">SOAL '+q.no+'</span><span class="pdf-q-instr">'+escAttr(q.instruksi)+'</span></div><div class="pdf-q-text">'+escAttr(q.text)+'</div>'+body+'</div>';
+}
+function renderSimpleTablePdf(t){
+  let h='<table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 10px"><thead><tr>'+t.headers.map(x=>'<th style="background:#1e5a8e;color:#fff;padding:6px;border:1px solid #d3e9fb">'+escAttr(x)+'</th>').join("")+'</tr></thead><tbody>';
+  t.rows.forEach(r=>{h+='<tr>'+r.map(x=>'<td style="padding:6px;border:1px solid #d3e9fb;text-align:center">'+escAttr(x)+'</td>').join("")+'</tr>';});
+  return h+'</tbody></table>';
+}
+function jawabanTxt(q){if(q.type==="pg")return q.correct.toUpperCase();if(q.type==="mcma")return q.correct.map(x=>x.toUpperCase()).join(", ");return q.statements.map(st=>st.correct.toUpperCase()).join(", ");}
+async function downloadSoalPDF(){
+  const overlay=document.getElementById("pdf-overlay");overlay.classList.add("active");
+  try{await document.fonts.ready;}catch(e){}
+  await new Promise(r=>setTimeout(r,200));
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:"mm",format:"a4"}),pageW=210,marginX=12,contentWmm=pageW-marginX*2,marginTop=14,pageHmax=297-14,renderWidthPx=720,pxPerMm=renderWidthPx/contentWmm;
+  let cursorY=marginTop;const stage=document.createElement("div");stage.id="pdf-render-temp";stage.style.width=renderWidthPx+"px";document.body.appendChild(stage);
+  async function renderBlockToPdf(html,gapAfter=4){
+    stage.innerHTML=html;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const canvas=await html2canvas(stage,{scale:2,backgroundColor:"#fff",useCORS:true});
+    const cssHeightPx=canvas.height/2,imgHmm=cssHeightPx/pxPerMm;
+    if(cursorY+imgHmm>pageHmax){doc.addPage();cursorY=marginTop;}
+    doc.addImage(canvas.toDataURL("image/jpeg",.95),"JPEG",marginX,cursorY,contentWmm,imgHmm);cursorY+=imgHmm+gapAfter;
+  }
+  await renderBlockToPdf('<div class="pdf-cover"><div class="pdf-band"><h1>SOAL &amp; PEMBAHASAN TRY OUT TKA 3 KIMIA</h1><h2>SMAN 2 LUWU UTARA</h2><p>Naskah Lengkap • Paket 3 (30 Soal) • Durasi 75 Menit</p></div></div>',6);
+  for(const q of QUESTIONS)await renderBlockToPdf(buildQuestionBlockHtml(q),4);
+  doc.addPage();cursorY=marginTop;
+  const kunciItems=QUESTIONS.map(q=>'<div class="pdf-kunci-item"><span>Soal '+q.no+':</span><b>'+jawabanTxt(q)+'</b></div>').join("");
+  await renderBlockToPdf('<div><div class="pdf-kunci-title">KUNCI JAWABAN SOAL 1 - 30</div><div class="pdf-kunci-grid">'+kunciItems+'</div></div>',6);
+  let pemb='<div><div class="pdf-pembahasan-title">PEMBAHASAN SOAL LENGKAP</div>';
+  QUESTIONS.forEach(q=>{pemb+='<div class="pdf-pembahasan-item"><b>Soal Nomor '+q.no+'</b> (Kunci: '+jawabanTxt(q)+')<br>'+escAttr(q.pembahasan)+'</div>';});pemb+='</div>';
+  await renderBlockToPdf(pemb,0);
+  document.body.removeChild(stage);overlay.classList.remove("active");
+  doc.save("Soal_dan_Pembahasan_TKA3_Kimia.pdf");
+}
+/* ===== PROTEKSI SOAL: cegah copy-paste saat ujian berlangsung ===== */
+(function(){
+  function quizAktif(){
+    var s=document.getElementById("screen-quiz");
+    return !!(s && s.classList.contains("active"));
+  }
+  function blok(e){ if(quizAktif()){ e.preventDefault(); return false; } }
+  ["copy","cut","contextmenu","selectstart","dragstart"].forEach(function(ev){
+    document.addEventListener(ev, function(e){
+      if(!quizAktif()) return;
+      if(ev==="copy"||ev==="cut"){ try{ e.clipboardData.setData("text/plain",""); }catch(x){} }
+      e.preventDefault();
+    }, true);
+  });
+  document.addEventListener("keydown", function(e){
+    if(!quizAktif()) return;
+    var k=(e.key||"").toLowerCase(), ctrl=e.ctrlKey||e.metaKey;
+    if( (ctrl && ["c","x","a","p","s","u"].indexOf(k)>-1) ||
+        (ctrl && e.shiftKey && ["i","j","c"].indexOf(k)>-1) ||
+        k==="f12" || k==="printscreen" ){
+      e.preventDefault(); e.stopPropagation();
+    }
+  }, true);
+  document.addEventListener("keyup", function(e){
+    if(quizAktif() && (e.key||"").toLowerCase()==="printscreen"){
+      try{ navigator.clipboard.writeText(""); }catch(x){}
+    }
+  }, true);
+  document.addEventListener("dragover", blok, true);
+})();
+window.addEventListener("beforeunload",e=>{if(document.getElementById("screen-quiz").classList.contains("active")&&!submitted){e.preventDefault();e.returnValue="";}});
+</script>
+</body>
+</html>
